@@ -22,6 +22,9 @@ export const mutations: MutationTree<RootState> = {
 }
 
 export const actions: ActionTree<RootState, RootState> = {
+  /**
+   * 都道府県取得
+   */
   async fetchPrefectures({ commit, state }) {
     await this.$axios
       .$get(`${state.resasBaseUrl}/api/v1/prefectures`, {
@@ -34,6 +37,10 @@ export const actions: ActionTree<RootState, RootState> = {
         commit('SET_PREFECTURES', prefectures)
       })
   },
+  /**
+   * 環境変数取得
+   * @param $config
+   */
   initEnv({ commit }, $config) {
     commit('SET_RESAS_API_KEY', $config.resasApiKey)
     commit('SET_RESAS_BASE_URL', $config.resasBaseUrl)
