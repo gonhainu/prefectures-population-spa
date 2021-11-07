@@ -12,6 +12,24 @@ export type RootState = ReturnType<typeof state>
 
 export const getters: GetterTree<RootState, RootState> = {
   prefectures: (state) => state.prefectures,
+  populations: (state) => {
+    // state.populations
+    const series = []
+    for (const population of state.populations) {
+      const prefCode = population.prefCode
+      let prefName: string | undefined = ''
+      if (state.prefectures.length > 0) {
+        prefName =
+          state.prefectures.find((item) => item.prefCode === prefCode)
+            ?.prefName || ''
+      }
+      series.push({
+        name: prefName,
+        data: population.populations.map((item) => [item.year, item.value]),
+      })
+    }
+    return series
+  },
 }
 
 export const mutations: MutationTree<RootState> = {
@@ -27,7 +45,7 @@ export const mutations: MutationTree<RootState> = {
       state.populations.splice(index, 1, prefecturePopulation)
     }
   },
-  DELETE_POPULATION: (state, prefCode) => {
+  DELETE_POPULATION: (state, prefCode: number) => {
     const index = state.populations.findIndex(
       (item) => item.prefCode === prefCode
     )
@@ -56,7 +74,7 @@ export const actions: ActionTree<RootState, RootState> = {
         commit('SET_PREFECTURES', prefectures)
       })
   },
-  async fetchPrefecturePopulation({ commit, state }, prefCode) {
+  async fetchPrefecturePopulation({ commit, state }, prefCode: number) {
     await this.$axios
       .$get(`${state.resasBaseUrl}/api/v1/population/composition/perYear`, {
         params: {
@@ -71,10 +89,10 @@ export const actions: ActionTree<RootState, RootState> = {
         const population = res.result.data.find(
           (item: { label: string; data: any }) => item.label === '総人口'
         ).data
-        commit('SET_POPULATION', { prefCode, population })
+        commit('SET_POPULATION', { prefCode, populations: population })
       })
   },
-  deletePrefecturePopulation({ commit }, prefCode: string) {
+  deletePrefecturePopulation({ commit }, prefCode: number) {
     commit('DELETE_POPULATION', prefCode)
   },
   /**

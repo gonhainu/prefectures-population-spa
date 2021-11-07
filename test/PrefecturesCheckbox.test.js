@@ -1,4 +1,3 @@
-// import NuxtCompositionApi from '@nuxtjs/composition-api'
 import { createLocalVue, shallowMount } from '@vue/test-utils'
 import { nextTick } from '@vue/composition-api'
 import Vuex from 'vuex'
@@ -6,7 +5,6 @@ import PrefecturesCheckbox from '@/components/PrefecturesCheckbox.vue'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
-// localVue.use(NuxtCompositionApi)
 
 const prefectures = [
   {

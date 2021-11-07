@@ -284,4 +284,61 @@ describe('index store', () => {
       expect(store.state.populations).toEqual([])
     })
   })
+
+  describe('getters', () => {
+    const populations = [
+      {
+        prefCode: 1,
+        populations: [
+          { year: 1985, value: 10000 },
+          { year: 1990, value: 12000 },
+        ],
+      },
+      {
+        prefCode: 2,
+        populations: [
+          { year: 1985, value: 10000 },
+          { year: 1990, value: 12000 },
+        ],
+      },
+    ]
+    const state = {
+      populations,
+      prefectures: [
+        { prefCode: 1, prefName: '北海道' },
+        { prefCode: 2, prefName: '青森県' },
+      ],
+    }
+    it('populations', () => {
+      const actual = storeIndex.getters.populations(state)
+      expect(actual).toEqual([
+        {
+          name: '北海道',
+          data: [
+            [
+              populations[0].populations[0].year,
+              populations[0].populations[0].value,
+            ],
+            [
+              populations[0].populations[1].year,
+              populations[0].populations[1].value,
+            ],
+          ],
+        },
+        {
+          name: '青森県',
+          data: [
+            [
+              populations[1].populations[0].year,
+              populations[1].populations[0].value,
+            ],
+            [
+              populations[1].populations[1].year,
+              populations[1].populations[1].value,
+            ],
+          ],
+        },
+      ])
+    })
+  })
 })

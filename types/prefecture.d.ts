@@ -8,5 +8,5 @@ export interface PrefecturePopulation {
   populations: {
     year: number
     value: number
-  }
+  }[]
 }
