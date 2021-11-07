@@ -21,11 +21,17 @@ export default {
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
 
+  publicRuntimeConfig: {
+    resasBaseUrl:
+      process.env.RESAS_BASE_URL || 'https://opendata.resas-portal.go.jp',
+    resasApiKey: process.env.RESAS_API_KEY,
+  },
+
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: [{ src: '~/plugins/nuxtClientInit.ts', ssr: false }],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
