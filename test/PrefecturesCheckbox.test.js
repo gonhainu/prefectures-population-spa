@@ -219,4 +219,27 @@ describe('PrefecturesCheckbox component', () => {
     await wrapper.find('#code-1').setChecked(false)
     expect(wrapper.vm.checkedPrefCode).toEqual([2])
   })
+
+  it('watchの検証', async () => {
+    const wrapper = shallowMount(PrefecturesCheckbox, { store, localVue })
+    await nextTick()
+    await wrapper.find('#code-1').setChecked()
+    expect(wrapper.vm.checkedPrefCode).toEqual([1])
+    // チェックをつけたときfetchPrefecturePopulationが呼ばれる
+    wrapper.vm.$nextTick(() => {
+      expect(store.dispatch).toHaveBeenCalledWith(
+        'fetchPrefecturePopulation',
+        1
+      )
+    })
+    // チェックを外したときdeletePrefecturePopulationが呼ばれる
+    await wrapper.find('#code-1').setChecked(false)
+    expect(wrapper.vm.checkedPrefCode).toEqual([])
+    wrapper.vm.$nextTick(() => {
+      expect(store.dispatch).toHaveBeenCalledWith(
+        'deletePrefecturePopulation',
+        1
+      )
+    })
+  })
 })

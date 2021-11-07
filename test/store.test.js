@@ -8,13 +8,24 @@ const localVue = createLocalVue()
 localVue.use(Vuex)
 
 let url = ''
+let config = {}
 const mockError = false
 jest.mock('axios', () => ({
-  $get: (_url) => {
+  $get: (_url, _config) => {
     return new Promise((resolve) => {
       if (mockError) throw new Error('Mock error')
       url = _url
-      resolve(true)
+      config = _config
+      resolve({
+        result: {
+          data: [
+            {
+              label: '総人口',
+              data: [],
+            },
+          ],
+        },
+      })
     })
   },
 }))
@@ -210,6 +221,11 @@ const prefectures = [
   },
 ]
 
+const population = {
+  prefCode: 1,
+  population: [{ year: 1985, value: 10000 }],
+}
+
 describe('index store', () => {
   describe('actions', () => {
     let store
@@ -223,6 +239,49 @@ describe('index store', () => {
       expect(url).toBe('/api/v1/prefectures')
       store.commit('SET_PREFECTURES', prefectures)
       expect(store.commit).toHaveBeenCalledWith('SET_PREFECTURES', prefectures)
+    })
+    it('fetch population', async () => {
+      await store.dispatch('fetchPrefecturePopulation', 1)
+      expect(url).toBe('/api/v1/population/composition/perYear')
+      expect(config.params).toEqual({ prefCode: 1, cityCode: '-' })
+      store.commit('SET_POPULATION', population)
+      expect(store.commit).toHaveBeenCalledWith('SET_POPULATION', population)
+    })
+  })
+  describe('mutation', () => {
+    let store
+    beforeEach(() => {
+      store = new Vuex.Store(cloneDeep(storeIndex))
+    })
+    it('SET_POPULATION', () => {
+      // 1個目の追加
+      store.commit('SET_POPULATION', population)
+      expect(store.state.populations).toEqual([population])
+      // 2個目の追加
+      const population2 = {
+        prefCode: 2,
+        population: [{ year: 1985, value: 10000 }],
+      }
+      store.commit('SET_POPULATION', population2)
+      expect(store.state.populations).toEqual([population, population2])
+      // 2個目の再追加 prefCode: 2の内容が書き換わる
+      const population3 = {
+        prefCode: 2,
+        population: [{ year: 1995, value: 10000 }],
+      }
+      store.commit('SET_POPULATION', population3)
+      expect(store.state.populations).toEqual([population, population3])
+    })
+    it('DELETE_POPULATION', () => {
+      // 1個目の追加
+      store.commit('SET_POPULATION', population)
+      expect(store.state.populations).toEqual([population])
+      // prefCode: 1 の削除
+      store.commit('DELETE_POPULATION', 1)
+      expect(store.state.populations).toEqual([])
+      // 存在しないprefCode: 2 の削除
+      store.commit('DELETE_POPULATION', 2)
+      expect(store.state.populations).toEqual([])
     })
   })
 })
