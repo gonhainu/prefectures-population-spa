@@ -33,6 +33,8 @@ export default defineComponent({
       yAxis: {
         title: {
           text: '人口数',
+          rotation: 0,
+          align: 'high',
         },
       },
       xAxis: {
